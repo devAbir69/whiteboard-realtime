@@ -2,9 +2,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multiplayer Whiteboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
     <style>
         body {
             margin: 0;
@@ -20,7 +21,7 @@
 
         h2 {
             font-size: 28px;
-            margin: 20px 0;
+            margin: 20px 0 10px;
             color: #3e0066;
             animation: glow 1.5s ease-in-out infinite alternate;
             text-align: center;
@@ -32,6 +33,48 @@
             }
             to {
                 text-shadow: 0 0 20px #b388ff, 0 0 30px #cda9ff;
+            }
+        }
+
+        .contact-line {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #222;
+        }
+
+        .email-pixel {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            display: inline-block;
+            background: linear-gradient(270deg, #ff0080, #7928ca, #00ffff, #00ff00, #ffff00, #ff0000);
+            background-size: 600% 600%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rgbShift 5s ease infinite, pulse 1.5s infinite alternate;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+            text-decoration: none;
+        }
+
+        @keyframes rgbShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.03);
             }
         }
 
@@ -156,9 +199,14 @@
 <body>
     <h2>🎨 Multiplayer Whiteboard</h2>
 
+    <p class="contact-line">
+        📩 Contact Admin – 
+        <a href="mailto:abirp.connect@gmail.com" class="email-pixel">abirp.connect@gmail.com</a>
+    </p>
+
     <div class="username-box">
         <label for="usernameInput">Enter your name:</label><br />
-        <input type="text" id="usernameInput" placeholder="Your name">
+        <input type="text" id="usernameInput" placeholder="Your name" />
         <button onclick="startDrawing()">Join</button>
     </div>
 
@@ -170,10 +218,10 @@
 
     <div class="toolbar">
         <label>Color:
-            <input type="color" id="colorPicker" value="#000000">
+            <input type="color" id="colorPicker" value="#000000" />
         </label>
         <label>Brush Size:
-            <input type="range" id="brushSize" min="2" max="20" value="4">
+            <input type="range" id="brushSize" min="2" max="20" value="4" />
         </label>
         <button id="eraserBtn">Eraser</button>
         <button id="clearBtn">Clear</button>
