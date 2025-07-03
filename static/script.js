@@ -4,6 +4,8 @@ const socket = io();
 
 let username = '';
 let isDrawingEnabled = false;
+let painting = false;
+let lastPos = null;
 
 // Join handler
 function startDrawing() {
@@ -19,7 +21,7 @@ function startDrawing() {
     }
 }
 
-// User joined broadcast
+// Handle user join
 socket.on('user_joined_announcement', (data) => {
     updateUserList(data.userList);
 
@@ -34,7 +36,7 @@ socket.on('user_joined_announcement', (data) => {
     }
 });
 
-// User left broadcast
+// Handle user leave
 socket.on('user_left_announcement', (data) => {
     updateUserList(data.userList);
 
@@ -43,7 +45,7 @@ socket.on('user_left_announcement', (data) => {
     setTimeout(() => joinNotice.textContent = '', 4000);
 });
 
-// Update user list in sidebar
+// Update connected user list
 function updateUserList(users) {
     const userListEl = document.getElementById('userList');
     userListEl.innerHTML = '';
@@ -54,7 +56,7 @@ function updateUserList(users) {
     });
 }
 
-// Tool setup
+// Toolbar tools
 let brushColor = '#000000';
 let brushSize = 4;
 let isErasing = false;
@@ -76,7 +78,7 @@ document.getElementById('clearBtn').addEventListener('click', () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 });
 
-// Canvas resize logic
+// Responsive canvas
 function resizeCanvas() {
     canvas.width = window.innerWidth * 0.95;
     canvas.height = window.innerHeight * 0.65;
@@ -84,41 +86,64 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// Drawing handlers
-let painting = false;
-
-canvas.addEventListener('mousedown', () => painting = true);
-canvas.addEventListener('mouseup', () => painting = false);
-canvas.addEventListener('mouseleave', () => painting = false);
-canvas.addEventListener('mousemove', draw);
-
-canvas.addEventListener('touchstart', () => painting = true);
-canvas.addEventListener('touchend', () => painting = false);
-canvas.addEventListener('touchcancel', () => painting = false);
-canvas.addEventListener('touchmove', drawTouch);
-
-function draw(e) {
+// Mouse drawing
+canvas.addEventListener('mousedown', (e) => {
+    painting = true;
+    lastPos = { x: e.clientX, y: e.clientY };
+});
+canvas.addEventListener('mouseup', () => {
+    painting = false;
+    lastPos = null;
+});
+canvas.addEventListener('mouseleave', () => {
+    painting = false;
+    lastPos = null;
+});
+canvas.addEventListener('mousemove', (e) => {
     if (!painting || !isDrawingEnabled) return;
     const pos = { x: e.clientX, y: e.clientY };
-    drawOnCanvas(pos);
-    socket.emit('draw_event', pos);
-}
+    drawLine(lastPos, pos);
+    socket.emit('draw_event', { from: lastPos, to: pos });
+    lastPos = pos;
+});
 
-function drawTouch(e) {
+// Touch drawing
+canvas.addEventListener('touchstart', (e) => {
+    painting = true;
+    const touch = e.touches[0];
+    lastPos = { x: touch.clientX, y: touch.clientY };
+});
+canvas.addEventListener('touchend', () => {
+    painting = false;
+    lastPos = null;
+});
+canvas.addEventListener('touchcancel', () => {
+    painting = false;
+    lastPos = null;
+});
+canvas.addEventListener('touchmove', (e) => {
     e.preventDefault();
     if (!painting || !isDrawingEnabled) return;
     const touch = e.touches[0];
     const pos = { x: touch.clientX, y: touch.clientY };
-    drawOnCanvas(pos);
-    socket.emit('draw_event', pos);
-}
+    drawLine(lastPos, pos);
+    socket.emit('draw_event', { from: lastPos, to: pos });
+    lastPos = pos;
+});
 
-function drawOnCanvas(pos) {
-    ctx.fillStyle = isErasing ? '#ffffff' : brushColor;
+// Draw function using line instead of dots
+function drawLine(from, to) {
+    if (!from || !to) return;
+    ctx.strokeStyle = isErasing ? '#ffffff' : brushColor;
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(pos.x, pos.y, brushSize / 2, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
 }
 
-// Receive draw event from others
-socket.on('broadcast_draw', drawOnCanvas);
+// Listen to other users' drawing
+socket.on('broadcast_draw', (data) => {
+    drawLine(data.from, data.to);
+});
