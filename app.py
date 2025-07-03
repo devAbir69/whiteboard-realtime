@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
+import os
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")  # Allow all origins (adjust if needed)
+socketio = SocketIO(app, cors_allowed_origins="*")  # Allow all origins
 
-# Store connected users and their socket IDs
 connected_users = set()
 users_by_sid = {}
 
@@ -43,4 +43,5 @@ def handle_draw_event(data):
     emit('broadcast_draw', data, broadcast=True)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)  # Set to False when deploying
+    port = int(os.environ.get('PORT', 5000))  # 💡 Dynamic for Render
+    socketio.run(app, host='0.0.0.0', port=port)
