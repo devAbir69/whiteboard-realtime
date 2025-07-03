@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Whiteboard</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #d3cce3, #e9e4f0);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin: 20px 0;
+            color: #3e0066;
+            animation: glow 1.5s ease-in-out infinite alternate;
+            text-align: center;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #a68edb, 0 0 10px #a68edb;
+            }
+            to {
+                text-shadow: 0 0 20px #b388ff, 0 0 30px #cda9ff;
+            }
+        }
+
+        .username-box {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .username-box input {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            width: 60%;
+        }
+
+        .username-box button {
+            padding: 8px 16px;
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .canvas-container {
+            background-color: #fff;
+            padding: 12px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 95%;
+            max-width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            border-radius: 10px;
+            touch-action: none;
+            border: 1px solid #bbb;
+        }
+
+        .toolbar {
+            margin: 20px;
+            padding: 12px 20px;
+            background-color: #ffffffcc;
+            border-radius: 12px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 95%;
+            max-width: 1000px;
+        }
+
+        .toolbar button {
+            padding: 6px 12px;
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toolbar button:hover {
+            background-color: #5a52e0;
+        }
+
+        .sidebar {
+            background: #ffffffcc;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 10px;
+            width: 220px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .sidebar {
+                width: 90%;
+                order: -1;
+                margin-top: 10px;
+            }
+
+            .username-box input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .username-box button {
+                width: 100%;
+            }
+
+            canvas {
+                max-height: 60vh;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2>🎨 Multiplayer Whiteboard</h2>
+
+    <div class="username-box">
+        <label>Enter your name: </label><br />
+        <input type="text" id="usernameInput" placeholder="Your name">
+        <button onclick="startDrawing()">Join</button>
+    </div>
+
+    <div class="sidebar">
+        <h4>👥 Connected Users</h4>
+        <ul id="userList"></ul>
+        <div id="joinNotice" style="margin-top: 10px; font-size: 14px;"></div>
+    </div>
+
+    <div class="toolbar">
+        <label>Color:
+            <input type="color" id="colorPicker" value="#000000">
+        </label>
+        <label>Brush Size:
+            <input type="range" id="brushSize" min="2" max="20" value="4">
+        </label>
+        <button id="eraserBtn">Eraser</button>
+        <button id="clearBtn">Clear</button>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="board"></canvas>
+    </div>
+
+    <audio id="joinSound" src="/static/join.mp3" preload="auto"></audio>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
