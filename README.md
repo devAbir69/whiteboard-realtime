@@ -16,7 +16,7 @@ A real-time collaborative whiteboard where multiple users can draw together usin
 
 ## 📸 Demo
 
-🔗 **Live Site:** [https://whiteboard-realtime-1-y0m6.onrender.com]
+🔗 **Live Site:** [https://whiteboard-realtime-ez6v.onrender.com]
 
 ---
 
